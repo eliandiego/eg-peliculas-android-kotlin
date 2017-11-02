@@ -21,7 +21,7 @@ class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
+     * device. 
      */
     private var mTwoPane: Boolean = false
 
