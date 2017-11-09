@@ -1,8 +1,8 @@
 # Búsqueda de Películas en Android
 
- <video width="99%" height="540" autoplay loop muted >
-        <source src="videos/peliculas_android_kotlin.mp4" type="video/mp4" >
- </video>
+<video width="99%" height="540" autoplay loop muted >
+  <source src="videos/peliculas_android_kotlin.mp4" type="video/mp4" >
+</video>
     
 Esta es una aplicación Master/Detail donde se visualizan películas disponibles de un stock.
 
