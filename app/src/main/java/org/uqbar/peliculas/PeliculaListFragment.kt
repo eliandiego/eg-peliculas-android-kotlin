@@ -45,7 +45,6 @@ class PeliculaListFragment : ListFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
-        Log.w("PeliculasApp", peliculas.toString())
         super.onCreate(savedInstanceState)
         listAdapter = PeliculaAdapter(
                 activity,
@@ -58,7 +57,6 @@ class PeliculaListFragment : ListFragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.w("PeliculasApp", "onViewCreated")
 
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {

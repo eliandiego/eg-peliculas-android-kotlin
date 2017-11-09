@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_pelicula_app_bar.*
+import kotlinx.android.synthetic.main.activity_pelicula_detail.*
 
-import kotlinx.android.synthetic.main.pelicula_list.*
 import org.ubqar_project.peliculasandroidkotlin.R
 import org.uqbar.peliculas.domain.Pelicula
 
@@ -21,7 +21,7 @@ class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device. 
+     * device.
      */
     private var mTwoPane: Boolean = false
 
