@@ -8,6 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@+id/label"
+        android:padding="5dp"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium">
     </TextView>
 
@@ -17,6 +18,7 @@
         android:layout_height="wrap_content"
         android:text="@+id/label"
         android:textSize="40px"
+        android:padding="5dp"
         android:paddingTop="3dp"
         android:paddingBottom="6dp"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small">

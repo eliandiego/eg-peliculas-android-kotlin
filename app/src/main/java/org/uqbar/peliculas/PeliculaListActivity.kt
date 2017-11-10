@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_pelicula_app_bar.*
 import kotlinx.android.synthetic.main.activity_pelicula_detail.*
-
 import org.ubqar_project.peliculasandroidkotlin.R
 import org.uqbar.peliculas.domain.Pelicula
 
