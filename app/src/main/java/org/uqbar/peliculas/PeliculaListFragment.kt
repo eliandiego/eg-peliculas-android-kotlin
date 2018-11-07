@@ -1,6 +1,7 @@
 package org.uqbar.peliculas
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.ListFragment
 import android.util.Log
@@ -47,7 +48,7 @@ class PeliculaListFragment : ListFragment() {
         val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
         super.onCreate(savedInstanceState)
         listAdapter = PeliculaAdapter(
-                activity,
+                activity as Context,
                 peliculas)
     }
 
@@ -55,7 +56,7 @@ class PeliculaListFragment : ListFragment() {
         super.onActivityCreated(savedInstanceState)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Restore the previously serialized activated item position.
@@ -91,7 +92,7 @@ class PeliculaListFragment : ListFragment() {
         mCallbacks.onItemSelected(pelicula)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (mActivatedPosition != ListView.INVALID_POSITION) {
             // Serialize and persist the activated item position.
@@ -112,7 +113,7 @@ class PeliculaListFragment : ListFragment() {
             ListView.CHOICE_MODE_NONE
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater!!.inflate(R.layout.pelicula_list_fragment, null, false)
     }
 

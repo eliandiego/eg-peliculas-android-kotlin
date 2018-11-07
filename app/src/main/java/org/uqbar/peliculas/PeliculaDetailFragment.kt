@@ -33,23 +33,22 @@ class PeliculaDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (arguments.containsKey(ARG_ITEM_ID)) {
+        if (arguments!!.containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            pelicula = arguments.get(ARG_ITEM_ID) as Pelicula
+            pelicula = arguments!!.get(ARG_ITEM_ID) as Pelicula
 
             val activity = this.activity
             if (toolbar_layout != null) {
                 toolbar_layout.title = pelicula.titulo
             } else {
-                activity.setTitle(pelicula.titulo)
+                activity!!.setTitle(pelicula.titulo)
             }
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_pelicula_detail, container, false)
         rootView.pelicula_actores.setText(pelicula.actores)
         rootView.pelicula_sinopsis.setText(pelicula.sinopsis)
