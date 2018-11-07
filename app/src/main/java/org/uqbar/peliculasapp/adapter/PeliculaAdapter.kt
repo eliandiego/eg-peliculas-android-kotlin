@@ -1,11 +1,11 @@
-package org.uqbar.peliculas.adapter
+package org.uqbar.peliculasapp.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import org.uqbar.peliculas.domain.Pelicula
+import org.uqbar.peliculasapp.domain.Pelicula
 import kotlinx.android.synthetic.main.pelicula_row.view.*
 import org.ubqar_project.peliculasandroidkotlin.R
 
@@ -25,8 +25,8 @@ class PeliculaAdapter(context: Context, peliculas: List<Pelicula>) : ArrayAdapte
         val rowView = inflater.inflate(R.layout.pelicula_row, parent, false)
         val pelicula = getItem(position)
 
-        rowView.lblPelicula.setText(pelicula.toString())
-        rowView.lblActores.setText(pelicula.actores.toString())
+        rowView.lblPelicula.setText(pelicula?.toString())
+        rowView.lblActores.setText(pelicula?.actores.toString())
         return rowView
     }
 }

@@ -1,6 +1,7 @@
-package org.uqbar.peliculas
+package org.uqbar.peliculasapp
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.ListFragment
 import android.text.Editable
@@ -10,85 +11,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
-import android.widget.ListView
-import android.widget.Toast
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.pelicula_list_fragment.*
+import android.widget.*
 import org.ubqar_project.peliculasandroidkotlin.R
-import org.uqbar.peliculas.adapter.PeliculaAdapter
-import org.uqbar.peliculas.domain.Pelicula
-import org.uqbar.peliculas.repo.RepoPeliculas
+import org.uqbar.peliculasapp.adapter.PeliculaAdapter
+import org.uqbar.peliculasapp.domain.Pelicula
+import org.uqbar.peliculasapp.service.PeliculasService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Path
-
 
 /**
- * SERVICE de RETROFIT
+ * De  * A list fragment representing a list of Peliculas. This fragment
+ * also supports tablet devices by allowing list items to be given an
+ * 'activated' state upon selection. This helps indicate which item is
+ * currently being viewed in a [PeliculaDetailFragment].
  *
- * https://android.jlelse.eu/kotlin-and-retrofit-2-tutorial-with-working-codes-333a4422a890
+ *
+ * Activities containing this fragment MUST implement the [Callbacks]
+ * interface.
  */
-interface PeliculasService {
-
-    @GET("peliculas/{tituloContiene}")
-    fun getPeliculas(@Path("tituloContiene") tituloContiene: String): Observable<List<Pelicula>>
-
-    companion object {
-        fun create(): PeliculasService {
-            val BASE_URL = "http://10.0.2.2:8080/videoclub-ui-grails-homes-xtend/"
-
-            val retrofit = Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build()
-
-            return retrofit.create(PeliculasService::class.java)
-
-        }
-    }
-}
-
 /**
- * Created by fernando on 1/11/2017.
+ * Mandatory empty constructor for the fragment manager to instantiate the
+ * fragment (e.g. upon screen orientation changes).
  */
 class PeliculaListFragment : ListFragment(), View.OnClickListener {
-
-    val peliculaService by lazy {
-        PeliculasService.create()
-    }
-
-    var disposable: Disposable? = null
-
-    override fun onClick(v: View?) {
-        buscarPeliculas();
-    }
-
-    fun buscarPeliculas() {
-        val titulo = tituloContiene.text.toString()
-
-        disposable =
-                peliculaService.getPeliculas(titulo)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                { peliculas ->
-                                    listAdapter = PeliculaAdapter(
-                                            activity,
-                                            peliculas!!)
-                                },
-                                { error ->
-                                    Toast.makeText(this@PeliculaListFragment.getActivity().getApplicationContext(), "Ocurrió un error al buscar películas. " + error.message, Toast.LENGTH_LONG).show()
-                                    Log.e("PeliculasApp", error.message)
-                                }
-                        )
-
-    }
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -101,13 +49,15 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
      */
     private var mActivatedPosition = ListView.INVALID_POSITION
 
+    private var peliculaService: PeliculasService? = null
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
      * selections.
      */
     interface Callbacks {
-        fun onItemSelected(pelicula: Pelicula?)
+        fun onItemSelected(pelicula: Pelicula)
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
@@ -116,13 +66,53 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Esta URL apunta al proyecto con ORM de Grails
+        // 		val API_URL = "http://10.0.2.2:8080/videoclub-ui-orm-grails"
+        // Esta URL apunta a la solución en Grails con Homes hechos en Xtend
+        //String SERVER_IP = "10.0.2.2";
+
+        // IMPORTANTE
+        // Por un bug de retrofit 2.0, la BASE_URL debe tener una / al final
+        // y la dirección del service debe comenzar sin /, como un path relativo
+        val BASE_URL = "http://10.0.2.2:8080/videoclub-ui-grails-homes-xtend/"
+
+        val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+        peliculaService = retrofit.create<PeliculasService>(PeliculasService::class.java)
+    }
+
+    private fun buscarPeliculas() {
+        val campoBusqueda = this.view!!.findViewById(R.id.tituloContiene) as EditText
+        val titulo = campoBusqueda.text.toString()
+
+        val peliculaCall = peliculaService!!.getPeliculas(titulo)
+
+        peliculaCall.enqueue(object : Callback<List<Pelicula>> {
+            override fun onResponse(call: Call<List<Pelicula>>, response: Response<List<Pelicula>>) {
+                val peliculas = response.body()
+
+                listAdapter = PeliculaAdapter(
+                        activity!!,
+                        peliculas!!)
+
+            }
+
+            override fun onFailure(call: Call<List<Pelicula>>, t: Throwable) {
+                t.printStackTrace()
+                Log.e("PeliculasApp", t.message)
+            }
+        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Restore the previously serialized activated item position.
@@ -131,8 +121,10 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
         }
 
         // Comportamiento del checkbox que indica si se busca a medida que se escribe
-        chkBuscarOnline.setOnClickListener {
-            if (chkBuscarOnline.isChecked) {
+        val chkBuscar = view.findViewById(R.id.chkBuscarOnline) as CheckBox
+        chkBuscar.setOnClickListener {
+            val btnBuscar = view.findViewById(R.id.btnBuscar) as ImageButton
+            if (chkBuscar.isChecked) {
                 btnBuscar.visibility = View.INVISIBLE
             } else {
                 btnBuscar.visibility = View.VISIBLE
@@ -140,6 +132,7 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
         }
 
         // Comportamiento del título de búsqueda
+        val tituloContiene = view.findViewById(R.id.tituloContiene) as EditText
         tituloContiene.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
 
@@ -148,17 +141,19 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(editable: Editable) {
-                if (chkBuscarOnline.isChecked && editable.length >= MIN_BUSQUEDA_PELICULAS) {
+                if (chkBuscar.isChecked && editable.length >= MIN_BUSQUEDA_PELICULAS) {
                     buscarPeliculas()
                 }
             }
         })
 
-        btnBuscar.setOnClickListener(this)
+        (view.findViewById(R.id.btnBuscar) as ImageButton).setOnClickListener(this)
     }
 
-    override fun onAttach(activity: Activity?) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        val activity : Activity = context as Activity
 
         // Activities containing this fragment must implement its callbacks.
         if (activity !is Callbacks) {
@@ -178,17 +173,19 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
     override fun onListItemClick(listView: ListView?, view: View?, position: Int, id: Long) {
         super.onListItemClick(listView, view, position, id)
 
-        // Notify the active callbacks interface (the activity, if the
-        // fragment is attached to one) that an item has been selected.
-        val pelicula = RepoPeliculas.instance.getPelicula(id)
+        val pelicula = listView!!.adapter.getItem(position) as Pelicula
+        Toast.makeText(context, pelicula.titulo, Toast.LENGTH_LONG).show()
+
         mCallbacks.onItemSelected(pelicula)
+
+
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (mActivatedPosition != ListView.INVALID_POSITION) {
             // Serialize and persist the activated item position.
-            outState!!.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition)
+            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition)
         }
     }
 
@@ -205,8 +202,8 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
             ListView.CHOICE_MODE_NONE
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater!!.inflate(R.layout.pelicula_list_fragment, null, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.pelicula_list_fragment, null, false)
     }
 
     private fun setActivatedPosition(position: Int) {
@@ -219,8 +216,13 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
         mActivatedPosition = position
     }
 
+    override fun onClick(v: View) {
+        buscarPeliculas()
+    }
+
     companion object {
-        val MIN_BUSQUEDA_PELICULAS = 2
+
+        var MIN_BUSQUEDA_PELICULAS = 2
 
         /**
          * The serialization (saved instance state) Bundle key representing the
@@ -233,9 +235,8 @@ class PeliculaListFragment : ListFragment(), View.OnClickListener {
          * nothing. Used only when this fragment is not attached to an activity.
          */
         private val sDummyCallbacks: Callbacks = object : Callbacks {
-            override fun onItemSelected(pelicula: Pelicula?) {}
+            override fun onItemSelected(pelicula: Pelicula) {}
         }
-
     }
 
 }

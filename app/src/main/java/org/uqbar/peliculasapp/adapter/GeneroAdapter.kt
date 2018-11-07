@@ -1,8 +1,7 @@
-package org.uqbar.peliculas.adapter
+package org.uqbar.peliculasapp.adapter
 
 import org.ubqar_project.peliculasandroidkotlin.R
-import org.uqbar.peliculas.domain.Genero
-import org.uqbar.peliculas.domain.Pelicula
+import org.uqbar.peliculasapp.domain.Pelicula
 import java.util.*
 
 /**

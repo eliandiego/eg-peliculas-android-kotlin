@@ -23,7 +23,7 @@
             android:fontFamily="typeface:BOLD"
             android:padding="16dp"
             android:textIsSelectable="true"
-            tools:context="org.uqbar.peliculas.PeliculaDetailFragment" />
+            tools:context="org.uqbar.peliculasapp.PeliculaDetailFragment" />
 
     </LinearLayout>
 
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:textIsSelectable="true"
-        tools:context="org.uqbar.peliculas.PeliculaDetailFragment" />
+        tools:context="org.uqbar.peliculasapp.PeliculaDetailFragment" />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -45,6 +45,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:textIsSelectable="true"
-        tools:context="org.uqbar.peliculas.PeliculaDetailFragment" />
+        tools:context="org.uqbar.peliculasapp.PeliculaDetailFragment" />
 
 </LinearLayout>

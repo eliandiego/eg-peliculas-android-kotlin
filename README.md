@@ -7,9 +7,9 @@ Esta es una aplicación Master/Detail donde se visualizan películas disponibles
 ## El proyecto
 Este proyecto está generado para
 
-* Android Studio 3.0 (Septiembre 2017)
-* con Gradle 3.0.0 (el que viene con Android Studio)
-* para una SDK 26 (Oreo)
+* Android Studio 3.2.1 (Noviembre 2018)
+* con Gradle 3.2.1 (el que viene con Android Studio)
+* para una SDK 28 (Pie)
 
 ## Conceptos que se ven en la app
 

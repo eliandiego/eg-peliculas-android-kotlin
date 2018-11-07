@@ -1,17 +1,15 @@
-package org.uqbar.peliculas
+package org.uqbar.peliculasapp
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_pelicula_detail.*
-import kotlinx.android.synthetic.main.fragment_pelicula_detail.*
 import kotlinx.android.synthetic.main.fragment_pelicula_detail.view.*
 import org.ubqar_project.peliculasandroidkotlin.R
-import org.uqbar.peliculas.adapter.GeneroAdapter
-import org.uqbar.peliculas.domain.Pelicula
+import org.uqbar.peliculasapp.adapter.GeneroAdapter
+import org.uqbar.peliculasapp.domain.Pelicula
 
 /**
  * A fragment representing a single Pelicula detail screen.
@@ -33,24 +31,23 @@ class PeliculaDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (arguments.containsKey(ARG_ITEM_ID)) {
+        if (arguments!!.containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            pelicula = arguments.get(ARG_ITEM_ID) as Pelicula
+            pelicula = arguments!!.get(ARG_ITEM_ID) as Pelicula
 
             val activity = this.activity
             if (toolbar_layout != null) {
                 toolbar_layout.title = pelicula.titulo
             } else {
-                activity.setTitle(pelicula.titulo)
+                activity!!.setTitle(pelicula.titulo)
             }
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val rootView = inflater!!.inflate(R.layout.fragment_pelicula_detail, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val rootView = inflater.inflate(R.layout.fragment_pelicula_detail, container, false)
         rootView.pelicula_actores.setText(pelicula.actores)
         rootView.pelicula_sinopsis.setText(pelicula.sinopsis)
         rootView.pelicula_genero.setText(pelicula.descripcionGenero)

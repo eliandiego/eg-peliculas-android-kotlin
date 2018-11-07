@@ -1,20 +1,32 @@
-package org.uqbar.peliculas
+package org.uqbar.peliculasapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_pelicula_app_bar.*
-import kotlinx.android.synthetic.main.activity_pelicula_detail.*
+import android.support.v7.widget.Toolbar
+import android.util.Log
 import org.ubqar_project.peliculasandroidkotlin.R
-import org.uqbar.peliculas.domain.Pelicula
+import org.uqbar.peliculasapp.domain.Pelicula
+
 
 /**
- * An activity representing a list of Pings. This activity
+ * An activity representing a list of Peliculas. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
  * lead to a [PeliculaDetailActivity] representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
+ *
+ *
+ * The activity makes heavy use of fragments. The list of items is a
+ * [PeliculaListFragment] and the item details
+ * (if present) is a [PeliculaDetailFragment].
+ *
+ *
+ * This activity also implements the required
+ * [PeliculaListFragment.Callbacks] interface
+ * to listen for item selections.
  */
 class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks {
 
@@ -28,10 +40,10 @@ class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pelicula_app_bar)
 
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
-        toolbar.title = title
 
-        if (pelicula_detail_container != null) {
+        if (findViewById<NestedScrollView>(R.id.pelicula_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-large and
             // res/values-sw600dp). If this view is present, then the
@@ -51,7 +63,7 @@ class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks
      * Callback method from [PeliculaListFragment.Callbacks]
      * indicating that the item with the given ID was selected.
      */
-    override fun onItemSelected(pelicula: Pelicula?) {
+    override fun onItemSelected(pelicula: Pelicula) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
@@ -68,6 +80,7 @@ class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             val detailIntent = Intent(this, PeliculaDetailActivity::class.java)
+            Log.w("Pelis", pelicula.titulo)
             detailIntent.putExtra(PeliculaDetailFragment.ARG_ITEM_ID, pelicula)
             startActivity(detailIntent)
         }

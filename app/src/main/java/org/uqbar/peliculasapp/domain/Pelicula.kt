@@ -1,4 +1,4 @@
-package org.uqbar.peliculas.domain
+package org.uqbar.peliculasapp.domain
 
 import java.io.Serializable
 
