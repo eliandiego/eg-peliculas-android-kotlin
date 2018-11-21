@@ -1,4 +1,4 @@
-# Búsqueda de Películas en Android
+    # Búsqueda de Películas en Android
 
 ![image](video/demo.gif)
 
@@ -17,6 +17,10 @@ Este proyecto está generado para
 * Navegación entre vistas mediante el uso de Intent
 * Redefinición del layout de una ListView y del detalle de una película
 * Binding manual de propiedades entre objetos de dominio (Película / Genero) y objetos visuales
+
+# Explicaciones
+
+- [Master detail - Ventana Master](documentation/masterDetailMaster.md)
 
 ## Branches
 
