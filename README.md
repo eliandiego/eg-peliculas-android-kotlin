@@ -1,6 +1,6 @@
-    # Búsqueda de Películas en Android
+# Búsqueda de Películas en Android
 
-![image](video/demo.gif)
+![image](videos/anim.gif)
 
 Esta es una aplicación Master/Detail donde se visualizan películas disponibles de un stock.
 
