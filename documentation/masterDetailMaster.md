@@ -162,7 +162,7 @@ _PeliculaListFragment.xml_
 
 Visualizamos el cambio:
 
-![image](images/peliculasListFragment.png)
+![image](../images/peliculasListFragment.png)
 
 ## Layout custom con dos filas
 
@@ -267,6 +267,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 Y ahora sí, podemos ver el cambio al reiniciar la aplicación:
 
-![image](images/peliculasList3.png)
+![image](../images/peliculasList3.png)
 
-![image](images/peliculasListArchitecture.png)
+![image](../images/peliculasListArchitecture.png)
