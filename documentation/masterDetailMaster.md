@@ -6,7 +6,7 @@ Queremos visualizar una lista de películas y al hacer click sobre una nos inter
 
 ## Crear un proyecto Master/Detail
 
-![creación](videos/createMasterDetail.gif)
+![creación](../videos/createMasterDetail.gif)
 
 Generamos un nuevo proyecto: File > New > New Project... elegimos un nombre representativo "PeliculasApp", el company name. Luego elegimos el dispositivo destino (Phone and Tablet).
 
