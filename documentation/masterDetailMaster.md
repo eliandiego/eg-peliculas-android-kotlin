@@ -39,7 +39,27 @@ De movida podemos ejecutar la aplicación gracias a todo el código [boilerplate
 
 ![peliculas list](../images/peliculasList.png)
 
-La lista se define en la `activity_peliculas_list.xml`:
+Solo hay que corregir un pequeño detalle, en la clase `PeliculaDetailFragment.kt`, dentro del método onCreate:
+
+```kt
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    arguments?.let {
+        if (it.containsKey(ARG_ITEM_ID)) {
+            // así está
+            // item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
+            // así la cambiamos
+            item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)!!]
+            activity?.toolbar_layout?.title = item?.content
+        }
+    }
+}
+```
+
+Después explicaremos en detalle cómo trabaja la vista.
+
+La lista de ítems se define en la `activity_pelicula_list.xml`:
 
 ```xml
 <android.support.design.widget.CoordinatorLayout ...>
@@ -53,43 +73,64 @@ La lista se define en la `activity_peliculas_list.xml`:
     </FrameLayout>
 ```
 
-_activity_peliculas_list.xml_
+El archivo de include `pelicula_list.xml` contiene un **RecyclerView**:
 
-El layout default es list_content, que tiene una [ListView](https://developer.android.com/guide/topics/ui/layout/listview.html).
-
-¿Dónde se llena la lista de elementos de la ListView? En el Fragment de la lista de películas, que extiende especialmente de ListFragment:
-
-```kt
-class PeliculaListFragment : ListFragment() {
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                                        xmlns:tools="http://schemas.android.com/tools"
+                                        android:id="@+id/pelicula_list"
+                                        android:name="com.example.fernando.peliculasbackup.PeliculaListFragment"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginLeft="16dp"
+                                        android:layout_marginRight="16dp"
+                                        app:layoutManager="LinearLayoutManager"
+                                        tools:context=".PeliculaListActivity"
+                                        tools:listitem="@layout/pelicula_list_content"/>
 ```
 
-Y específicamente en el método onCreate:
+Como vemos, este container define un **list item** cuyo contenido define una [ListView](https://developer.android.com/guide/topics/ui/layout/listview.html) en un archivo aparte: pelicula_list_content.xml. Sí, demasiadas indirecciones para un simple master/detail.
+
+¿Dónde se llena la lista de elementos de la ListView? En la activity de la lista de películas:
 
 ```kt
-override fun onCreate(savedInstanceState: Bundle) {
-    val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
-    super.onCreate(savedInstanceState)
-    listAdapter = new ArrayAdapter<DummyContent.DummyItem>(
-        getActivity(),
-        android.R.layout.simple_list_item_activated_1,
-        android.R.id.text1,
-        DummyContent.ITEMS)
+class PeliculaListActivity : AppCompatActivity() {
+```
+
+Y específicamente en el método onCreate, se llama al método setupRecyclerView que configura nuestro container donde se encuentra la list view antes mencionada:
+
+```kt
+private fun setupRecyclerView(recyclerView: RecyclerView) {
+    recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, twoPane)
 }
 ```
+
+La clase SimpleItemRecyclerViewAdapter será la encargada de responder ante eventos de usuario como el click que permitirá navegar hacia la vista de detalle.
 
 Reemplazamos entonces DummyContents.ITEMS por una lista de películas de un Repositorio creado para la ocasión:
 
 ```kt
-override fun onCreate(savedInstanceState: Bundle) {
-    val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
-    super.onCreate(savedInstanceState)
-    listAdapter = PeliculaAdapter(
-            activity as Context,
-            peliculas)
+private fun setupRecyclerView(recyclerView: RecyclerView) {
+    recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, RepoPeliculas.getPeliculas(null, 10), twoPane)
 }
 ```
 
-En esta versión muy sencilla, cada línea muestra el toString() redefinido en película:
+Esto requiere modificar también la clase SimpleItemRecyclerViewAdapter, para guardar una lista de películas, y los valores asociados en la list view (id y título):
+
+```kt
+class SimpleItemRecyclerViewAdapter(
+    private val parentActivity: PeliculaListActivity,
+    private val values: List<Pelicula>,   // <-- cambiamos el tipo de List<DummyContent.DummyItem>
+
+    ...
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = values[position]
+        holder.idView.text = item.id.toString()   // el id como String
+        holder.contentView.text = item.titulo     // el título de la película o lo que deseemos
+```
 
 ![images](../images/peliculasList2.png)
 
