@@ -20,7 +20,8 @@ Este proyecto está generado para
 
 # Explicaciones
 
-- [Master detail - Ventana Master](documentation/masterDetailMaster.md)
+* [Ventana Master - Lista de películas](documentation/masterDetailMaster.md)
+* [Navegación a ventana detail](documentation/masterDetailDetail.md)
 
 ## Branches
 
