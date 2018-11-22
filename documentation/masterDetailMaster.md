@@ -6,6 +6,8 @@ Queremos visualizar una lista de películas y al hacer click sobre una nos inter
 
 ## Crear un proyecto Master/Detail
 
+![creación](videos/createMasterDetail.gif)
+
 Generamos un nuevo proyecto: File > New > New Project... elegimos un nombre representativo "PeliculasApp", el company name. Luego elegimos el dispositivo destino (Phone and Tablet).
 
 Entonces elegimos como tipo de proyecto un "Master / Detail Flow" y configuramos:
@@ -40,20 +42,15 @@ De movida podemos ejecutar la aplicación gracias a todo el código [boilerplate
 La lista se define en la `activity_peliculas_list.xml`:
 
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<android.support.design.widget.CoordinatorLayout ...>
+    <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <fragment
-        android:id="@+id/fragment1"
-        android:name="org.uqbar.peliculasapp.PeliculaListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</LinearLayout>
+        <include layout="@layout/pelicula_list"/>
+    </FrameLayout>
 ```
 
 _activity_peliculas_list.xml_
