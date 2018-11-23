@@ -5,7 +5,7 @@ Tenemos por el momento una aplicación que muestra una lista de películas, quer
 ¿Cómo navegamos la aplicación para ver el detalle? Una opción es
 
 * en la lista, incorporar la acción mediante un botón o link
-* al hacer click sobre un elemento, visualizamos el elemento
+* al hacer click sobre un elemento, navegamos a la vista de detalle
 
 Elegimos la segunda opción, porque la primera fuerza a repetir las acciones para cada línea y eso nos quita espacio para mostrar más info de una película.
 
@@ -24,36 +24,35 @@ Dejamos algunas lecturas recomendadas:
 
 # Pasaje de información entre actividades
 
-Cuando creamos un proyecto de tipo Master/Detail, el IDE nos generó varias líneas que se encargan de resolver este tema. Ahora vamos a estudiarlo para saber cómo funciona y ver si es necesario hacer algún ajuste. Primero que nada tenemos que ver cómo le llega la información desde la actividad Lista hacia la Detalle:
+Cuando creamos un proyecto de tipo Master/Detail, el IDE nos generó varias líneas que se encargan de resolver este tema. Ahora vamos a estudiarlo para saber cómo funciona y ver si es necesario hacer algún ajuste. Primero que nada tenemos que ver cómo le llega la información desde la actividad Lista hacia la Detalle, en la clase SimpleItemRecyclerViewAdapter que está en PeliculaListActivity. Dicha clase tiene un observer sobre los elementos de la list view, definido por la variable `onClickListener` y se inicializa de la siguiente manera:
 
 ```kt
-override fun onListItemClick(listView: ListView, view: View, position: Int, id: Long) {
-    super.onListItemClick(listView, view, position, id)
+private val onClickListener: View.OnClickListener
 
-    // Notify the active callbacks interface (the activity, if the
-    // fragment is attached to one) that an item has been selected.
-    super.onListItemClick(listView, view, position, id)
-    mCallbacks.onItemSelected(pelicula)
+init {
+    onClickListener = View.OnClickListener { v ->
+        val item = v.tag as DummyContent.DummyItem
+        if (twoPane) {
+            val fragment = PeliculaDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putString(PeliculaDetailFragment.ARG_ITEM_ID, item.id)
+                }
+            }
+            parentActivity.supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.pelicula_detail_container, fragment)
+                .commit()
+        } else {
+            val intent = Intent(v.context, PeliculaDetailActivity::class.java).apply {
+                putExtra(PeliculaDetailFragment.ARG_ITEM_ID, item.id)
+            }
+            v.context.startActivity(intent)
+        }
+    }
 }
 ```
 
-_LibroListFragment.kt_
-
-Aquí se dispara el evento a los observers o callbacks que están interesados en escuchar cuando el usuario selecciona una película.
-
-¿Quién es el interesado? La Activity que muestra la lista:
-
-```kt
-class PeliculaListActivity : AppCompatActivity(), PeliculaListFragment.Callbacks {
-```
-
-Pero antes de seguir debemos cambiar esta línea:
-
-```kt
-mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id)
-```
-
-porque viene del código boilerplate que genera Android Studio para un proyecto master/detail flow. Recibimos la posicion del elemento seleccionado, y un id entre otras cosas, ¿qué tenemos que pasar?
+Antes de hablar de la navegación, estudiemos qué información estamos queriendo tomar para identificar la película que el usuario seleccionó, puede ser
 
 * la posición del elemento
 * el identificador de la película
@@ -63,62 +62,17 @@ porque viene del código boilerplate que genera Android Studio para un proyecto 
 
 # Navegación
 
-Para poder obtener el identificador de la película, tenemos que modificar la implementación default que hereda PeliculaAdapter de ArrayAdapter, donde:
+Si miramos nuevamente el método en , vemos que hay un if:
 
 ```kt
-override fun getItemId(position: Int): Long {
-    return position
-}
-```
-
-Ok, entonces lo modificamos para obtener el identificador real de nuestro objeto película. Como ArrayAdapter encapsula la colección de elementos que muestra la ListView, esto nos obliga a utilizar el método getItem para luego pedirle el id:
-
-```kt
-override fun getItemId(position: Int): Long {
-    return getItem(position)!!.id!!
-}
-```
-
-Kotlin viene con un operador !! que permite [manejar en forma segura valores nulos](https://kotlinlang.org/docs/reference/null-safety.html).
-
-Ahora sí el método onListItemClick recibe como parámetro el identificador posta de la película y lo puede utilizar:
-
-```kt
-override fun onListItemClick(listView: ListView, view: View, position: Int, id: Long) {
-    super.onListItemClick(listView, view, position, id)
-
-    // Notify the active callbacks interface (the activity, if the
-    // fragment is attached to one) that an item has been selected.
-    mCallbacks.onItemSelected("" + id)
-}
-```
-
-_PeliculaListFragment.kt_
-
-El parámetro id, no obstante es un String, lo que nos obliga a hacer un casteo: String.valueOf(id) o bien "" + id, que tiene el mismo efecto.
-
-La actividad debe implementar el método onItemSelected. Si miramos el método, vemos que hay un if:
-
-```kt
-override fun onItemSelected(pelicula: Pelicula?) {
-    if (mTwoPane) {
-        // In two-pane mode, show the detail view in this activity by
-        // adding or replacing the detail fragment using a
-        // fragment transaction.
-        val arguments = Bundle()
-        arguments.putString(PeliculaDetailFragment.ARG_ITEM_ID, id)
-        val fragment = PeliculaDetailFragment()
-        fragment.arguments = arguments
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.pelicula_detail_container, fragment)
-                .commit()
-
-    } else {
-        // In single-pane mode, simply start the detail activity
-        // for the selected item ID.
-        val detailIntent = Intent(this, PeliculaDetailActivity::class.java) // PeliculaDetailActivity.class de java
-        detailIntent.putExtra(PeliculaDetailFragment.ARG_ITEM_ID, id)
-        startActivity(detailIntent)
+init {
+    onClickListener = View.OnClickListener { v ->
+        val item = v.tag as DummyContent.DummyItem
+        if (twoPane) {
+            ...
+        } else {
+            ...
+        }
     }
 }
 ```
@@ -127,9 +81,116 @@ _PeliculaListActivity.kt_
 
 Esta división se da porque
 
-* si estamos testeando la aplicación con un dispositivo cuyo tamaño nos permite unificar en una sola actividad el fragmento lista y el detalle, estamos en modo two-pane. Más adelante estudiaremos su comportamiento.
-* los dispositivos como el teléfono, que tienen una pantalla de tamaño chico, trabajan en modo single-pane, entonces hay que navegar hacia la vista de detalle. 
+* si estamos testeando la aplicación con un dispositivo cuyo tamaño nos permite unificar en una sola actividad el fragmento lista y el detalle, estamos en modo **two-pane**. Más adelante estudiaremos su comportamiento.
+* los dispositivos como el teléfono, que tienen una pantalla de tamaño chico, trabajan en modo single-pane, entonces hay que navegar hacia la vista de detalle.
 
-Nos concentraremos por el momento en la solución single-pane, que crea la navegación hacia la vista detalle mediante el concepto Intent, una abstracción que representa cualquier tipo de operación. El intent define un método putExtra donde pasamos parámetros de una actividad a otra, en este caso el id de la película seleccionada.
+Nos concentraremos por el momento en la solución **single-pane**, que crea la navegación hacia la vista detalle mediante el concepto Intent, una abstracción que representa cualquier tipo de operación. El intent define un método putExtra donde pasamos parámetros de una actividad a otra, en este caso el id de la película seleccionada.
 
 En la actividad de detalle recibimos el id y se lo pasamos al fragment:
+
+```kt
+class PeliculaDetailActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        ...
+        if (savedInstanceState == null) {
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
+            val fragment = PeliculaDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putString(
+                        PeliculaDetailFragment.ARG_ITEM_ID,
+                        intent.getStringExtra(PeliculaDetailFragment.ARG_ITEM_ID)
+                    )
+                }
+            }
+
+            supportFragmentManager.beginTransaction()
+                .add(R.id.pelicula_detail_container, fragment)
+                .commit()
+        }
+    }
+```
+
+En el fragment lo transformamos en un objeto película para mostrar la información de dicha película. Reemplazamos 
+
+```kt
+class PeliculaDetailFragment : Fragment() {
+
+    /**
+     * The dummy content this fragment is presenting.
+     */
+    private var item: DummyContent.DummyItem? = null
+```
+
+por 
+
+```kt
+    private var item: Pelicula? = null
+```
+
+Y también tenemos que obtener el objeto película en base al id, delegando en el repo:
+
+```kt
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            if (it.containsKey(ARG_ITEM_ID)) {
+                // Load the dummy content specified by the fragment
+                // arguments. In a real-world scenario, use a Loader
+                // to load content from a content provider.
+                item = RepoPeliculas.getPelicula(it.getString(ARG_ITEM_ID)!!.toLong())
+                activity?.toolbar_layout?.title = item?.titulo
+            }
+        }
+    }
+```
+
+Entonces
+
+* tomamos de los argumentos el ARG_ITEM_ID que tiene como string el id de la película
+* forzamos con el operador `!!` a que [no pueda ser nulo](https://kotlinlang.org/docs/reference/null-safety.html) para convertirlo a Long
+* luego le pasamos el id al repo y tenemos la película
+* para mostrar su título en la toolbar de la vista de detalle
+
+Para terminar de corregir lo que falta, en el método onCreateView vamos a mostrar la sinopsis de la película:
+
+```kt
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val rootView = inflater.inflate(R.layout.pelicula_detail, container, false)
+
+        // Show the dummy content as text in a TextView.
+        item?.let {
+            rootView.pelicula_detail.text = it.sinopsis // <-- fix
+        }
+```
+
+Y por último, en PeliculaListActivity debemos modificar la inicialización de la clase SimpleItemRecyclerViewAdapter para castear correctamente a un objeto película, y guardar el id como string:
+
+```kt
+    init {
+        onClickListener = View.OnClickListener { v ->
+            val item = v.tag as Pelicula <-- casteamos a Pelicula
+            if (twoPane) {
+                val fragment = PeliculaDetailFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(PeliculaDetailFragment.ARG_ITEM_ID, item.id.toString()) <-- pasamos a String
+                    }
+                }
+                parentActivity.supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.pelicula_detail_container, fragment)
+                    .commit()
+            } else {
+                val intent = Intent(v.context, PeliculaDetailActivity::class.java).apply {
+                    putExtra(PeliculaDetailFragment.ARG_ITEM_ID, item.id.toString()) <--- pasamos a String
+```
+
+Vemos ahora sí cómo funciona la navegación de la vista master a la detalle:
+
+![video](../videos/detailCustom.gif)
+
