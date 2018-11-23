@@ -134,131 +134,95 @@ class SimpleItemRecyclerViewAdapter(
 
 ![images](../images/peliculasList2.png)
 
-(pueden probar cambiar el método toString() en Pelicula).
 
 ## Otra variante
 
-Podemos construir nuestro propio fragmento custom, para lo cual hacemos algunos cambios:
+Podemos construir nuestro propio fragmento custom, por ejemplo para mostrar
 
-En la actividad reemplazamos al fragmento con el layout predefinido por un fragment incluido en un Linear Layout:
+* el título de la película
+* el género a la que pertenece, en cursiva
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <fragment
-        android:id="@+id/fragment1"
-        android:name="org.uqbar.peliculas.PeliculaListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</LinearLayout>
-```
-
-_activity_pelicula_list.xml_
-
-En un xml separado definimos el layout del fragmento:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    <ListView
-           android:id="@android:id/list"
-           android:background="@android:color/holo_blue_dark"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content" >
-    </ListView>
-    <TextView
-           android:id="@android:id/empty"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content" >
-   </TextView>
-</LinearLayout>
-```
-
-pelicula_list_fragment.xml
-
-El ListView tiene la propiedad background en azul sólo por fines didácticos.
-
-Para poder utilizar esta vista en el fragment, tenemos que "inflar" (bindear) el layout en el código del Fragment:
-
-```kt
-override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle): View {
-    return inflater!!.inflate(R.layout.pelicula_list_fragment, null, false)
-}
-```
-
-_PeliculaListFragment.xml_
-
-Visualizamos el cambio:
-
-![image](../images/peliculasListFragment.png)
-
-## Layout custom con dos filas
-
-Vamos a modificar el layout default para mostrar 2 filas:
-
-* en la primera mostramos el título de la película con un tamaño grande
-* en la segunda se visualiza la lista de actores
-
-Qué tenemos que hacer
-
-* definir un layout específico para cada fila que va a reemplazar el layout default: esto es un xml
-* generar un adapter, para "inflar" el layout custom de cada ítem: esto es código Java que recibe la lista de películas y transforma cada fila
-* y en el Controller (ListFragment) reemplazar el ArrayAdapter de películas default por el nuevo adapter 
-
-## Layout específico
-
-Definimos el layout con dos filas, cada una con un TextView que muestra todo el contenido del texto:
+El archivo _pelicula_list_content.xml_ tiene la definición de lo que muestra cada ítem. Modificamos los id de los primeros textview por `titulo` y `genero`. También agregamos propiedades específicas para los textos (size = 14 para el título, 12 para el género, que además se visualizará en _italic_). El layout principal es Linear, pero ahora vertical. Agregamos al final una línea horizontal utilizando el color primario del tema elegido (esto permite asociarlo a la paleta de colores elegida).
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
     <TextView
-        android:id="@+id/lblPelicula"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@+id/label"         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large.Inverse">  
-    </TextView>
+            android:id="@+id/titulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:textAppearance="?attr/textAppearanceListItem"/>
+
     <TextView
-        android:id="@+id/lblActores"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@+id/label"
-        android:textSize="40px"        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium.Inverse">
-    </TextView>  
+            android:id="@+id/genero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textSize="12dp"
+            android:textStyle="italic"
+            android:textAppearance="?attr/textAppearanceListItem"/>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
+
 </LinearLayout>
 ```
 
-_pelicula_row.xml_
+Esto rompe las líneas de SimpleItemRecyclerViewAdapter:
 
-Los textos se visualizan en inversa, porque vamos a cambiar el color de fondo del List View a negro:
-
-```xml
-<ListView
-    android:id="@android:id/list"
-    android:background="@android:color/black"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-</ListView>
+```kt
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val idView: TextView = view.id_text          // NO COMPILA
+        val contentView: TextView = view.content     // NO COMPILA
+    }
 ```
 
-_pelicula_list_fragment.xml_
+Corregimos esto:
 
-## Adapter de películas
+```kt
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = values[position]
+        holder.tituloView.text = item.titulo
+        holder.generoView.text = item.descripcionGenero
+        ...
+    }
 
-PeliculaAdapter hereda de ArrayAdapter, aunque también hay otras variantes: BaseAdapter o SimpleAdapter.
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tituloView: TextView = view.titulo
+        val generoView: TextView = view.genero
+    }
+```
+
+La relación entre vista y modelo de vista se da en el método onCreateViewHolder de SimpleItemRecyclerViewAdapter:
+
+```kt
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.pelicula_list_content, parent, false)
+        return ViewHolder(view)
+    }
+```
+
+Las nuevas versiones separan
+
+* la configuración del xml que se va a usar para cada ítem
+* vs. el binding específico de los valores que están dentro de ese xml (en nuestro caso título y género)
+
+Vemos cómo queda nuestra list view custom:
+
+![image](../images/customListView.png)
+
+
+# Adapter de películas
+
+Otra opción es definir nuestro propio adapter PeliculaAdapter que herede de ArrayAdapter, aunque también hay otras variantes: BaseAdapter o SimpleAdapter.
 
 Veamos el constructor del adapter...
 
