@@ -222,7 +222,7 @@ Vemos cómo queda nuestra list view custom:
 
 # Adapter de películas
 
-Otra opción es definir nuestro propio adapter PeliculaAdapter que herede de ArrayAdapter, aunque también hay otras variantes: BaseAdapter o SimpleAdapter.
+Otra alternativa para que [nuestra activity no tenga tanta responsabilidad](https://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/) es definir nuestro propio adapter PeliculaAdapter que herede de ArrayAdapter, aunque también hay otras variantes: BaseAdapter o SimpleAdapter.
 
 Veamos el constructor del adapter...
 
@@ -239,36 +239,86 @@ Es importante respetar algunas cosas:
 Ahora sí por cada uno de los elementos se invoca al método getView, donde se arma el binding entre el row y los valores de cada película:
 
 ```kt
-override fun getView(position: Int, convertView: View, parent: ViewGroup): View {
-    val inflater = context
-            .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    val rowView = inflater.inflate(R.layout.pelicula_row, parent, false)
-    val pelicula = getItem(position)
+override fun getItemId(position: Int): Long {
+    return getItem(position)!!.id!!
+}
 
-    rowView.lblPelicula.setText(pelicula.toString())
-    rowView.lblActores.setText(pelicula.actores.toString())
+override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    val inflater = context
+        .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    val rowView = inflater.inflate(R.layout.pelicula_list_content, parent, false)
+    val pelicula = getItem(position)!!
+
+    rowView.lblPelicula.text = pelicula.titulo
+    rowView.lblActores.text = pelicula.actores.toString()
     return rowView
 }
 ```
 
-El modelo que propone Android y el lenguaje Java no nos ayudan para bajar la cantidad de líneas que necesitamos, pero creemos que se entiende el concepto.
+## Cambios en la controller master
 
-Reemplazar el Adapter en el Fragment
-
-Sólo nos falta reemplazar el ArrayAdapter por nuestro PeliculaAdapter, en el _PeliculaListFragment_:
+Modificaremos la superclase de nuestro controller master
 
 ```kt
-override fun onCreate(savedInstanceState: Bundle?) {
-    val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
+class PeliculaListActivity : ListActivity() {
+```
+
+Esto define una referencia `listAdapter`, que reemplazará a la anterior clase SimpleItemRecyclerViewAdapter:
+
+```kt
+override fun onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
-    listAdapter = PeliculaAdapter(
-            activity as Context,
-            peliculas)
+    setContentView(R.layout.activity_pelicula_list)
+    toolbar.title = title
+    ... el resto igual ...
+
+    // delegamos a nuestro adapter que sabe cómo mostrar cada fila de nuestro listview
+    val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
+    listAdapter = PeliculaAdapter(this, peliculas)
 }
 ```
 
-Y ahora sí, podemos ver el cambio al reiniciar la aplicación:
+## Cambios en las vistas
+
+Para que funcione, primero tenemos que modificar la vista `pelicula_list.xml`, ya que no usaremos más un Recycler View sino una List View:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+</ListView>
+```
+
+Por otro lado, si recordamos el Adapter, está utilizando dos referencias de la vista:
+
+```kt
+rowView.lblPelicula.text = pelicula.titulo
+rowView.lblActores.text = pelicula.actores.toString()
+```
+
+que son justamente las que tenemos que definir en nuestro archivo `pelicula_list_content.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout ...>
+    <TextView
+            android:id="@+id/lblPelicula"
+            .../>
+
+    <TextView
+            android:id="@+id/lblActores"
+            .../>
+
+    <View   .../>
+</LinearLayout>
+```
+
+Ahora sí, visualizamos la lista de películas:
 
 ![image](../images/peliculasList3.png)
 
 ![image](../images/peliculasListArchitecture.png)
+TODO: Modificar porque no hay más ListFragment
