@@ -318,7 +318,7 @@ que son justamente las que tenemos que definir en nuestro archivo `pelicula_list
 
 Ahora sí, visualizamos la lista de películas:
 
-![image](../images/peliculasList3.png)
+![image](../images/peliculasListAdapter.png)
 
 ![image](../images/peliculasListArchitecture.png)
 TODO: Modificar porque no hay más ListFragment
