@@ -320,5 +320,4 @@ Ahora sí, visualizamos la lista de películas:
 
 ![image](../images/peliculasListAdapter.png)
 
-![image](../images/peliculasListArchitecture.png)
-TODO: Modificar porque no hay más ListFragment
+![image](../images/peliculaListArchitecture.png)

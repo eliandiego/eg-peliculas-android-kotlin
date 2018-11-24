@@ -22,6 +22,7 @@ Este proyecto está generado para
 
 * [Ventana Master - Lista de películas](documentation/masterDetailMaster.md)
 * [Navegación a ventana detail](documentation/masterDetailDetail.md)
+* [La aplicación en distintos dispositivos](documentation/activitiesFragmentsDispositivos.md)
 
 ## Branches
 
