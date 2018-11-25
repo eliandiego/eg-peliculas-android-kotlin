@@ -12,9 +12,9 @@ Generamos un nuevo proyecto: File > New > New Project... elegimos un nombre repr
 
 Entonces elegimos como tipo de proyecto un "Master / Detail Flow" y configuramos:
 
-* Object Kind: "Pelicula"
-* Object Kind Plural: "Peliculas"
-* Title: "Películas"
+* **Object Kind**: "Pelicula"
+* **Object Kind Plural**: "Peliculas"
+* **Title**: "Películas"
 
 ## Activities y Fragments
 
