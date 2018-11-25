@@ -18,20 +18,19 @@ Entonces elegimos como tipo de proyecto un "Master / Detail Flow" y configuramos
 
 ## Activities y Fragments
 
-Al finalizar la actividad, vemos que se generaron 4 vistas:
+Al finalizar la actividad, vemos que se generaron 3 vistas:
 
 * PeliculaListActivity
-* PeliculaListFragment
 * PeliculaDetailActivity
 * PeliculaDetailFragment
 
 El fragment permite bajar la granularidad de la actividad en partes más pequeñas. La activity puede contener uno o más fragments. De esa manera podemos trabajar los componentes visuales de diferente manera para un smartphone o una tablet. Por el momento sabemos que
 
-* la activity PeliculaList define
-  * el título,
-  * los action buttons, en principio ninguno,
-  * y la navegación. Por el momento pensemos en una aplicación para smartphones, entonces la navegación consistiría en que cuando el usuario selecciona una película eso dispara una actividad nueva donde se muestra el detalle de la película (PeliculaDetailActivity + PeliculaDetailFragment). [Más adelante](./activitiesFragmentsDispositivos.md) veremos que esta separación actividad / fragmento permite combinarlos para diferentes dispositivos.
-* el fragment PeliculaList define la vista con la lista de películas
+La activity PeliculaList define
+
+* el título,
+* los action buttons, en principio ninguno,
+* y la navegación. Por el momento pensemos en una aplicación para smartphones, entonces la navegación consistiría en que cuando el usuario selecciona una película eso dispara una actividad nueva donde se muestra el detalle de la película (PeliculaDetailActivity + PeliculaDetailFragment). [Más adelante](./activitiesFragmentsDispositivos.md) veremos que esta separación actividad / fragmento permite combinarlos para diferentes dispositivos.
 
 ## Lista de Películas
 
@@ -57,7 +56,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-Después explicaremos en detalle cómo trabaja la vista.
+El [operador !! de Kotlin](https://kotlinlang.org/docs/reference/null-safety.html) nos asegura que item deba tener algún valor, de lo contrario lanzará una `Null Pointer Exception` en esa línea.
 
 La lista de ítems se define en la `activity_pelicula_list.xml`:
 
@@ -73,7 +72,7 @@ La lista de ítems se define en la `activity_pelicula_list.xml`:
     </FrameLayout>
 ```
 
-El archivo de include `pelicula_list.xml` contiene un **RecyclerView**:
+El archivo de include `pelicula_list.xml` contiene un [Recycler View](https://developer.android.com/guide/topics/ui/layout/recyclerview):
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -81,7 +80,7 @@ El archivo de include `pelicula_list.xml` contiene un **RecyclerView**:
                                         xmlns:app="http://schemas.android.com/apk/res-auto"
                                         xmlns:tools="http://schemas.android.com/tools"
                                         android:id="@+id/pelicula_list"
-                                        android:name="com.example.fernando.peliculasbackup.PeliculaListFragment"
+                                        android:name="org.uqbar.peliculasapp.PeliculaListFragment"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
                                         android:layout_marginLeft="16dp"
@@ -107,9 +106,12 @@ private fun setupRecyclerView(recyclerView: RecyclerView) {
 }
 ```
 
-La clase SimpleItemRecyclerViewAdapter será la encargada de responder ante eventos de usuario como el click que permitirá navegar hacia la vista de detalle.
+La clase SimpleItemRecyclerViewAdapter tendrá como misión responder a dos eventos:
 
-Reemplazamos entonces DummyContents.ITEMS por una lista de películas de un Repositorio creado para la ocasión:
+* en la inicialización, para generar cada una de las filas de la lista de películas (con la información asociada a cada línea)
+* cuando el usuario haga click sobre una película, debe navegar hacia la vista de detalle.
+
+Reemplazamos los DummyContents.ITEMS por una lista de películas de un Repositorio creado para la ocasión:
 
 ```kt
 private fun setupRecyclerView(recyclerView: RecyclerView) {
@@ -117,7 +119,7 @@ private fun setupRecyclerView(recyclerView: RecyclerView) {
 }
 ```
 
-Esto requiere modificar también la clase SimpleItemRecyclerViewAdapter, para guardar una lista de películas, y los valores asociados en la list view (id y título):
+Esto requiere modificar también la clase SimpleItemRecyclerViewAdapter que renombraremos a **PeliculaAdapter**, más apropiada para nuestro dominio:
 
 ```kt
 class SimpleItemRecyclerViewAdapter(
@@ -134,15 +136,15 @@ class SimpleItemRecyclerViewAdapter(
 
 ![images](../images/peliculasList2.png)
 
-
 ## Otra variante
 
 Podemos construir nuestro propio fragmento custom, por ejemplo para mostrar
 
 * el título de la película
-* el género a la que pertenece, en cursiva
+* la lista de actores
+* y una línea horizontal que actúe como separador
 
-El archivo _pelicula_list_content.xml_ tiene la definición de lo que muestra cada ítem. Modificamos los id de los primeros textview por `titulo` y `genero`. También agregamos propiedades específicas para los textos (size = 14 para el título, 12 para el género, que además se visualizará en _italic_). El layout principal es Linear, pero ahora vertical. Agregamos al final una línea horizontal utilizando el color primario del tema elegido (esto permite asociarlo a la paleta de colores elegida).
+El archivo _pelicula_list_content.xml_ tiene la definición de lo que muestra cada ítem. Modificamos los id de los primeros textview por `lblPelicula` y `lblActores`. También agregamos propiedades específicas para los textos (size = 14 para el título, 12 para el género, que además se visualizará en _italic_). El layout principal es Linear, pero ahora vertical. Agregamos al final una línea horizontal utilizando el color primario del tema elegido (esto permite asociarlo a la paleta de colores elegida).
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -152,14 +154,15 @@ El archivo _pelicula_list_content.xml_ tiene la definición de lo que muestra ca
               android:orientation="vertical">
 
     <TextView
-            android:id="@+id/titulo"
+            android:id="@+id/lblPelicula"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14dp"
+            android:paddingLeft="@dimen/text_padding"
             android:textAppearance="?attr/textAppearanceListItem"/>
 
     <TextView
-            android:id="@+id/genero"
+            android:id="@+id/lblActores"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
@@ -175,7 +178,13 @@ El archivo _pelicula_list_content.xml_ tiene la definición de lo que muestra ca
 </LinearLayout>
 ```
 
-Esto rompe las líneas de SimpleItemRecyclerViewAdapter:
+También podemos agregar un padding específico al label de la película, externalizando el valor para no asociarlo solamente a esta vista: tenemos para ello un archivo específico `res/values/dimens.xml`. Vemos cómo el Android Studio nos ayuda a lograr esto:
+
+![image](../../videos/padding.gif)
+
+### Corrigiendo el binding de una fila
+
+Esto rompe las líneas de PeliculaAdapter:
 
 ```kt
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -188,15 +197,19 @@ Corregimos esto:
 
 ```kt
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.tituloView.text = item.titulo
-        holder.generoView.text = item.descripcionGenero
-        ...
+        val pelicula = values[position]
+        holder.peliculaView.text = pelicula.titulo
+        holder.actoresView.text = pelicula.actores
+
+        with(holder.itemView) {
+            tag = pelicula
+            setOnClickListener(onClickListener)
+        }
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tituloView: TextView = view.titulo
-        val generoView: TextView = view.genero
+        val peliculaView: TextView = view.lblPelicula
+        val actoresView: TextView = view.lblActores
     }
 ```
 
@@ -213,110 +226,9 @@ La relación entre vista y modelo de vista se da en el método onCreateViewHolde
 Las nuevas versiones separan
 
 * la configuración del xml que se va a usar para cada ítem
-* vs. el binding específico de los valores que están dentro de ese xml (en nuestro caso título y género)
+* vs. el binding específico de los valores que están dentro de ese xml (en nuestro caso título y actores)
 
 Vemos cómo queda nuestra list view custom:
-
-![image](../images/customListView.png)
-
-
-# Adapter de películas
-
-Otra alternativa para que [nuestra activity no tenga tanta responsabilidad](https://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/) es definir nuestro propio adapter PeliculaAdapter que herede de ArrayAdapter, aunque también hay otras variantes: BaseAdapter o SimpleAdapter.
-
-Veamos el constructor del adapter...
-
-```kt
-class PeliculaAdapter(context: Context, peliculas: List<Pelicula>) : ArrayAdapter<Pelicula>(context, R.layout.pelicula_row, peliculas) {
-```
-
-Es importante respetar algunas cosas:
-
-* el context suele ser la actividad en la que está contenido el ListView
-* asociamos como formato la fila anteriormente definida: R.layout.pelicula_row
-* el tercer parámetro (la lista de películas) es muy importante pasarlo al constructor de la superclase. De lo contrario la list view quedará vacía, por más que almacenemos el argumento peliculas en una variable de instancia.
-
-Ahora sí por cada uno de los elementos se invoca al método getView, donde se arma el binding entre el row y los valores de cada película:
-
-```kt
-override fun getItemId(position: Int): Long {
-    return getItem(position)!!.id!!
-}
-
-override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-    val inflater = context
-        .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    val rowView = inflater.inflate(R.layout.pelicula_list_content, parent, false)
-    val pelicula = getItem(position)!!
-
-    rowView.lblPelicula.text = pelicula.titulo
-    rowView.lblActores.text = pelicula.actores.toString()
-    return rowView
-}
-```
-
-## Cambios en la controller master
-
-Modificaremos la superclase de nuestro controller master
-
-```kt
-class PeliculaListActivity : ListActivity() {
-```
-
-Esto define una referencia `listAdapter`, que reemplazará a la anterior clase SimpleItemRecyclerViewAdapter:
-
-```kt
-override fun onCreate(savedInstanceState: Bundle) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_pelicula_list)
-    toolbar.title = title
-    ... el resto igual ...
-
-    // delegamos a nuestro adapter que sabe cómo mostrar cada fila de nuestro listview
-    val peliculas = RepoPeliculas.instance.getPeliculas(null, 10)
-    listAdapter = PeliculaAdapter(this, peliculas)
-}
-```
-
-## Cambios en las vistas
-
-Para que funcione, primero tenemos que modificar la vista `pelicula_list.xml`, ya que no usaremos más un Recycler View sino una List View:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-</ListView>
-```
-
-Por otro lado, si recordamos el Adapter, está utilizando dos referencias de la vista:
-
-```kt
-rowView.lblPelicula.text = pelicula.titulo
-rowView.lblActores.text = pelicula.actores.toString()
-```
-
-que son justamente las que tenemos que definir en nuestro archivo `pelicula_list_content.xml`:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout ...>
-    <TextView
-            android:id="@+id/lblPelicula"
-            .../>
-
-    <TextView
-            android:id="@+id/lblActores"
-            .../>
-
-    <View   .../>
-</LinearLayout>
-```
-
-Ahora sí, visualizamos la lista de películas:
 
 ![image](../images/peliculasListAdapter.png)
 
