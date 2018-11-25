@@ -180,7 +180,7 @@ El archivo _pelicula_list_content.xml_ tiene la definición de lo que muestra ca
 
 También podemos agregar un padding específico al label de la película, externalizando el valor para no asociarlo solamente a esta vista: tenemos para ello un archivo específico `res/values/dimens.xml`. Vemos cómo el Android Studio nos ayuda a lograr esto:
 
-![image](../../videos/padding.gif)
+![image](../videos/padding.gif)
 
 ### Corrigiendo el binding de una fila
 
@@ -232,4 +232,4 @@ Vemos cómo queda nuestra list view custom:
 
 ![image](../images/peliculasListAdapter.png)
 
-![image](../images/peliculaListArchitecture.png)
+![image](../images/listaPeliculasArquitectura.png)
