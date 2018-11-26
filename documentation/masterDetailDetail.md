@@ -212,5 +212,8 @@ Este layout es interesante, porque permite mezclar dos LinearLayout:
 
 Vemos ahora sí cómo funciona la navegación de la vista master a la detalle:
 
-![video](../videos/detailCustom.gif)
+![video](../videos/detailCustom2.gif)
 
+TODO: arquitectura
+
+TODO 2: Pasar una película en el intent y mostrar arquitectura
