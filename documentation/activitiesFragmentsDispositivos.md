@@ -6,9 +6,9 @@ Hasta el momento hemos visto la aplicación en un emulador de un dispositivo sim
 
 En el menú Tools > AVD Manager o bien al ejecutar nuestra aplicación, podemos generar un nuevo dispositivo:
 
-![video](../../videos/configuringTablet.gif)
+![video](../videos/configuringTablet.gif)
 
-A partir de aquí, podemos emular una tablet o un celular, con resultados quizás diferentes.
+A partir de aquí, podemos emular una tablet o un celular, con resultados diferentes.
 
 ## Corrigiendo la visualización para tablets
 

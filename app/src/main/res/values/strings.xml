@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Peliculas Android Kotlin</string>
-    <string name="title_pelicula_detail">Detalle de Película</string>
+    <string name="app_name">Peliculas</string>
+    <string name="title_pelicula_detail">Pelicula Detail</string>
 </resources>

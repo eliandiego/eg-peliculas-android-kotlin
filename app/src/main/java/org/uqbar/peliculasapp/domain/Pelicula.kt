@@ -1,4 +1,4 @@
-package org.uqbar.peliculas.domain
+package org.uqbar.peliculasapp.domain
 
 import java.io.Serializable
 
@@ -13,8 +13,10 @@ class Genero(var descripcion: String) : Serializable {
     }
 }
 
- class Pelicula(var titulo:String, var genero: Genero?, var sinopsis:String, var actores:String):Serializable {
+class Pelicula(var titulo:String, var genero: Genero?, var sinopsis:String, var actores:String):Serializable {
+
     var id:Long? = null
+
     val descripcionGenero:String
         get() = if (genero == null) {
             ""
@@ -22,6 +24,10 @@ class Genero(var descripcion: String) : Serializable {
 
     override fun toString():String {
         return titulo
+    }
+
+    fun matchea(_titulo: String?): Boolean {
+        return _titulo == null || _titulo.toUpperCase().contains(titulo.toUpperCase())
     }
 
 }
