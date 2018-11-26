@@ -10,9 +10,9 @@ En el menú Tools > AVD Manager o bien al ejecutar nuestra aplicación, podemos 
 
 A partir de aquí, podemos emular una tablet o un celular, con resultados diferentes.
 
-## Corrigiendo la visualización para tablets
+## Vista específica para tablets
 
-De primera intención no vemos mucha diferencia, salvo que tenemos un emulador de nueve pulgadas. Lo que sucede es que nuestra vista `pelicula_list (w900dp)` quedó igual que antes:
+Al crear una vista master/detail tenemos una vista `pelicula_list (w900dp)` para dispositivos de más de 900 dp:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -46,3 +46,9 @@ De primera intención no vemos mucha diferencia, salvo que tenemos un emulador d
 
 </LinearLayout>
 ```
+
+En esta vista vemos que hay dos elementos dispuestos en un layout horizontal (uno al lado del otro):
+
+* el primero referencia a la lista de películas (PeliculaListActivity)
+* el segundo es un contenedor cuyo identificador es `pelicula_detail_container`
+

@@ -42,7 +42,11 @@ class PeliculaDetailFragment : Fragment() {
 
         // Show the dummy content as text in a TextView.
         item?.let {
-            rootView.pelicula_detail.text = it.sinopsis
+            rootView.pelicula_actores.text = it.actores
+            rootView.pelicula_sinopsis.text = it.sinopsis
+            rootView.pelicula_genero.text = it.descripcionGenero
+            rootView.imgGenero.setImageDrawable(resources.getDrawable(
+                    GeneroAdapter.getIconoGenero(it), null))
         }
 
         return rootView
