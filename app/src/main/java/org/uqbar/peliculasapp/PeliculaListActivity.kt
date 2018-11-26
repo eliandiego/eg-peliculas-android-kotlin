@@ -16,7 +16,7 @@ import org.uqbar.peliculasapp.domain.Pelicula
 import org.uqbar.peliculasapp.repo.RepoPeliculas
 
 /**
- * An activity representing a list of Pings. This activity
+ * An activity representing a list of Peliculas. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
  * lead to a [PeliculaDetailActivity] representing
