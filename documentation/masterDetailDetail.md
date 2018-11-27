@@ -9,7 +9,7 @@ Tenemos por el momento una aplicación que muestra una lista de películas, quer
 
 Elegimos la segunda opción, porque la primera quita espacio para mostrar más info de una película, además de la repetición de los botones.
 
-# User Experience
+## User Experience
 
 Estas decisiones forman parte de la “experiencia de usuario” o UX por sus siglas en inglés, _User eXperience_. La parte visual juega un papel muy importante en el desarrollo de este tipo de aplicaciones, donde podemos
 
@@ -22,7 +22,7 @@ Dejamos algunas lecturas recomendadas:
 * http://developer.android.com/design/patterns/navigation.html
 * http://developer.android.com/design/patterns/navigation-drawer.html
 
-# Pasaje de información entre actividades
+## Pasaje de información entre actividades
 
 Cuando creamos un proyecto de tipo Master/Detail, el IDE nos generó varias líneas que se encargan de resolver este tema. Ahora vamos a estudiarlo para saber cómo funciona y ver si es necesario hacer algún ajuste. Primero que nada tenemos que ver cómo le llega la información desde la actividad Lista hacia la Detalle, en la clase PeliculaAdapter (que originalmente se llamaba SimpleItemRecyclerViewAdapter), dentro de la definición PeliculaListActivity. Dicha clase tiene un observer sobre los elementos de la list view, definido por la variable `onClickListener` y se inicializa de la siguiente manera:
 
@@ -55,7 +55,7 @@ Antes de hablar de la navegación, estudiemos qué información estamos queriend
 
 ¿Qué es lo que resultaría más cómodo? Uno podría valorar a priori tener un objeto película, pero hay que tener en cuenta que la lista de películas puede hacerse mediante un servicio REST, que quizás no nos entregue toda la información de la película, sino que use una representación en JSON reducida, para bajar la cantidad de datos a transmitir.
 
-# Navegación
+## Navegación
 
 Si miramos nuevamente el método init en `PeliculaListActivity.kt`, vemos que hay un if:
 
@@ -130,7 +130,6 @@ Entonces
 * forzamos con el operador `!!` a que [no pueda ser nulo](https://kotlinlang.org/docs/reference/null-safety.html) para convertirlo a Long
 * luego le pasamos el id al repo y tenemos la película
 * para mostrar su título en la toolbar de la vista de detalle
-
 
 ## Detalle custom de una película
 
@@ -214,6 +213,15 @@ Vemos ahora sí cómo funciona la navegación de la vista master a la detalle:
 
 ![video](../videos/detailCustom2.gif)
 
-TODO: arquitectura
+## Navegación - gráfico general
 
-TODO 2: Pasar una película en el intent y mostrar arquitectura
+![image](../images/NavegacionMasterDetail.png)
+
+## Tareas para el lector
+
+* En lugar de pasar un id como string, podríamos pasar una película desde la actividad master a la detail: eso evitaría hacer una búsqueda en el repositorio.
+* Agregar un EditText para que el usuario ingrese un valor a filtrar en la búsqueda, hacerlo
+  * primero, con un botón de búsqueda
+  * luego, a medida que el usuario va escribiendo
+  * y por último que se pueda configurar mediante un checkbox
+* Modificar el layout de manera que quede la imagen y la descripción del género a izquierda y a derecha los actores y la sinopsis
