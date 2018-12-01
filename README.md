@@ -381,5 +381,5 @@ class PeliculaListActivity : AppCompatActivity(), View.OnClickListener {
 
 ## Demo final
 
-![video](./video/demoFinal.gif)
+![video](./videos/demoFinal.gif)
 
