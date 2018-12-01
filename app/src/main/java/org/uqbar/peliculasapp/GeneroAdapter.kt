@@ -33,7 +33,7 @@ object GeneroAdapter {
     }
 
     fun getIconoGenero(pelicula: Pelicula): Int {
-        val result = mapaGeneros[pelicula.descripcionGenero]!!
+        val result = mapaGeneros[pelicula.descripcionGenero] ?: 0
         return if (result == 0) {
             R.drawable.default3
         } else result

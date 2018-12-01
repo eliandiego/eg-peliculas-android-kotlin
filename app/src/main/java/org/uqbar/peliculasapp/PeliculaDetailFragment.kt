@@ -2,7 +2,6 @@ package org.uqbar.peliculasapp
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import kotlinx.android.synthetic.main.activity_pelicula_detail.*
 import kotlinx.android.synthetic.main.activity_pelicula_list.*
 import kotlinx.android.synthetic.main.pelicula_detail.view.*
 import org.uqbar.peliculasapp.domain.Pelicula
-import org.uqbar.peliculasapp.repo.RepoPeliculas
 
 
 /**
@@ -28,10 +26,7 @@ class PeliculaDetailFragment : Fragment() {
 
         arguments?.let {
             if (it.containsKey(ARG_ITEM_ID)) {
-                // Load the dummy content specified by the fragment
-                // arguments. In a real-world scenario, use a Loader
-                // to load content from a content provider.
-                item = RepoPeliculas.getPelicula(it.getString(ARG_ITEM_ID)!!.toLong())
+                item = it.getSerializable(ARG_ITEM_ID) as Pelicula
                 activity?.toolbar_layout?.title = item?.titulo
                 activity?.toolbar?.title = item?.titulo
             }

@@ -1,13 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-                                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                                        xmlns:tools="http://schemas.android.com/tools"
-                                        android:id="@+id/pelicula_list"
-                                        android:name="org.uqbar.peliculasapp.PeliculaListFragment"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:layout_marginLeft="16dp"
-                                        android:layout_marginRight="16dp"
-                                        app:layoutManager="LinearLayoutManager"
-                                        tools:context="org.uqbar.peliculasapp.PeliculaListActivity"
-                                        tools:listitem="@layout/pelicula_list_content"/>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <EditText
+                android:id="@+id/tituloContiene"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:ems="14"/>
+
+        <ImageButton
+                android:id="@+id/btnBuscar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/buscar"
+                android:onClick="buscarPeliculas"
+                android:src="@drawable/ic_action_search"/>
+    </LinearLayout>
+
+    <CheckBox
+            android:id="@+id/chkBuscarOnline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buscarInmediatamente"
+    />
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                                            xmlns:tools="http://schemas.android.com/tools"
+                                            android:id="@+id/pelicula_list"
+                                            android:name="org.uqbar.peliculasapp.PeliculaListFragment"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginTop="24dp"
+                                            android:layout_marginLeft="16dp"
+                                            android:layout_marginRight="16dp"
+                                            app:layoutManager="LinearLayoutManager"
+                                            tools:context="org.uqbar.peliculasapp.PeliculaListActivity"
+                                            tools:listitem="@layout/pelicula_list_content"/>
+
+</LinearLayout>

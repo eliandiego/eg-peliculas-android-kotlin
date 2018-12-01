@@ -38,13 +38,11 @@ class PeliculaDetailActivity : AppCompatActivity() {
         // http://developer.android.com/guide/components/fragments.html
         //
         if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
             val fragment = PeliculaDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putString(
+                    putSerializable(
                         PeliculaDetailFragment.ARG_ITEM_ID,
-                        intent.getStringExtra(PeliculaDetailFragment.ARG_ITEM_ID)
+                        intent.getSerializableExtra(PeliculaDetailFragment.ARG_ITEM_ID)
                     )
                 }
             }

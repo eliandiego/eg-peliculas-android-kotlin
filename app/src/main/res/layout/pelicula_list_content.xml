@@ -8,7 +8,7 @@
             android:id="@+id/lblPelicula"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14dp"
+            android:textSize="17dp"
             android:paddingLeft="@dimen/text_padding"
             android:textAppearance="?attr/textAppearanceListItem"/>
 
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
-            android:textSize="12dp"
+            android:textSize="14dp"
             android:textStyle="italic"
             android:textAppearance="?attr/textAppearanceListItem"/>
 
